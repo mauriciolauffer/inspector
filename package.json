@@ -48,6 +48,8 @@
     "load-grunt-config": "~3.0.1",
     "load-grunt-tasks": "~5.1.0",
     "mocha": "^11.1.0",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
     "prettify-xml": "^1.2.0",
     "sinon": "~9.0.2",
     "time-grunt": "~2.0.0",
@@ -67,6 +69,9 @@
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
+    "lint:oxc": "oxlint",
+    "format:check": "oxfmt --check",
+    "format": "oxfmt",
     "generate:typescript": "tsc",
     "postinstall": "npm run generate:typescript && node -e \"require('grunt').tasks(['dist']);\"",
     "prepare": "husky install",
