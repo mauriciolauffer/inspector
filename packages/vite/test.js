@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ui5InspectorPlugin, ui5Devframe, UI5_DEVFRAME_ID } from './dist/index.js';
 
-test('Vite plugin creates valid plugin instance', () => {
+test('Vite plugin creates valid plugin instance with default options', () => {
   const plugin = ui5InspectorPlugin();
   assert.equal(plugin.name, 'vite-plugin-ui5-devtools');
   assert.equal(typeof plugin.devtools, 'object');
@@ -34,4 +34,28 @@ test('Vite plugin devtools setup installs Devframe definition into Vite DevTools
   assert.equal(installedDevframes[0].options.base, '/__ui5-inspector/');
   assert.equal(installedDevframes[0].options.dock.title, 'UI5 Inspector');
   assert.equal(installedDevframes[0].options.dock.category, 'framework');
+});
+
+test('Vite plugin supports custom base and dock overrides', async () => {
+  const plugin = ui5InspectorPlugin({
+    base: '/custom-ui5/',
+    dock: {
+      title: 'Custom UI5 Title',
+      category: 'advanced'
+    }
+  });
+
+  const installedDevframes = [];
+  const fakeKitCtx = {
+    install: async (devframeDef, options) => {
+      installedDevframes.push({ devframeDef, options });
+    }
+  };
+
+  await plugin.devtools.setup(fakeKitCtx);
+
+  assert.equal(installedDevframes.length, 1);
+  assert.equal(installedDevframes[0].options.base, '/custom-ui5/');
+  assert.equal(installedDevframes[0].options.dock.title, 'Custom UI5 Title');
+  assert.equal(installedDevframes[0].options.dock.category, 'advanced');
 });

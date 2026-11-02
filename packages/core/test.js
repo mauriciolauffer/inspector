@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ui5Devframe, UI5_DEVFRAME_ID, getClientAssetsPath } from './dist/index.js';
+import * as clientModule from './dist/client.js';
 
 test('Devframe definition has correct metadata', () => {
   assert.equal(ui5Devframe.id, 'ui5-inspector');
@@ -19,7 +20,7 @@ test('clientAssets directory exists and contains index.html and scripts', () => 
   assert.ok(fs.existsSync(path.join(assetsPath, 'vendor')), 'vendor directory must exist');
 });
 
-test('RPC functions are registered in Devframe setup', () => {
+test('RPC functions are registered in Devframe setup with scoped context', () => {
   const registered = [];
   const fakeCtx = {
     scope: (id) => {
@@ -47,4 +48,25 @@ test('RPC functions are registered in Devframe setup', () => {
   const pingResult = ping.handler();
   assert.equal(pingResult.pong, true);
   assert.ok(typeof pingResult.timestamp === 'number');
+});
+
+test('Devframe setup handles context without scope or rpc', () => {
+  const registered = [];
+  const directCtx = {
+    rpc: {
+      register: (fn) => registered.push(fn)
+    }
+  };
+  ui5Devframe.setup(directCtx);
+  assert.equal(registered.length, 2);
+
+  const noRpcCtx = {};
+  assert.doesNotThrow(() => {
+    ui5Devframe.setup(noRpcCtx);
+  });
+});
+
+test('client module re-exports connectDevframe', () => {
+  assert.ok(clientModule);
+  assert.equal(typeof clientModule.connectDevframe, 'function');
 });
