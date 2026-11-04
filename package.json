@@ -17,6 +17,7 @@
     "@commitlint/config-conventional": "^16.2.1",
     "browserify": "^16.5.1",
     "browserify-istanbul": "^3.0.1",
+    "c8": "^12.0.0",
     "chai": "~4.2.0",
     "chrome-stub": "^1.0.2",
     "coveralls": "^3.1.1",
@@ -48,10 +49,12 @@
     "load-grunt-config": "~3.0.1",
     "load-grunt-tasks": "~5.1.0",
     "mocha": "^11.1.0",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
     "prettify-xml": "^1.2.0",
     "sinon": "~9.0.2",
     "time-grunt": "~2.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.8.2"
   },
   "engines": {
     "node": ">=10.0.0"
@@ -60,7 +63,17 @@
     "type": "git",
     "url": "https://github.com/UI5/inspector"
   },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "test:coverage": "pnpm -r run build && c8 --include=\"packages/core/dist/index.js\" --include=\"packages/core/dist/client.js\" --include=\"packages/vite/dist/index.js\" --lines 85 --branches 85 --functions 85 --statements 85 node --test packages/*/test.js",
+    "lint:oxc": "oxlint",
+    "format:check": "oxfmt --check",
+    "format": "oxfmt",
     "generate:typescript": "tsc",
     "postinstall": "npm run generate:typescript && node -e \"require('grunt').tasks(['dist']);\"",
     "prepare": "husky install",
